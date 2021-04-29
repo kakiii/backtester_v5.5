@@ -14,8 +14,7 @@ source('framework/processResults.R')
 # Read in data -- here with the A2 direction; subset it as required
 dataList <- getData(directory = "A2")
 # subset data: choose the period to run on
-dataList <- lapply(dataList, function(x)
-  x[1:819])
+dataList <- lapply(dataList, function(x) x[1:825])
 
 # Choose strategy -- this should be called strategy.R when you submit it
 strategyFile <- 'strategies/strategy.R'
@@ -25,6 +24,19 @@ source(strategyFile) # load in getOrders
 
 
 # Strategy parameters -- this will not be an empty list when you are done
+parameter_combination <-
+  expand.grid(
+    "short" = c(5, 10),
+    "medium" = c(50, 75, 100),
+    "long" = c(100, 150, 200)
+  )
+real_parameter_combination <-
+  parameter_combination[(parameter_combination$short < parameter_combination$medium &
+                          parameter_combination$medium < parameter_combination$long),]
+row.names(real_parameter_combination)<- 1:nrow(real_parameter_combination)
+
+periods<- list(startIn =1,endIn = 825,startOut=826,endOut=2000)
+
 params <- list(
   series = 1:10,
   lookbacks = list(
@@ -36,7 +48,17 @@ params <- list(
 print("Parameters:")
 print(params)
 
-# Do backtest
-results <- backtest(dataList, getOrders, params, sMult = 0.2)
-pfolioPnL <- plotResults(dataList, results)
-print(pfolioPnL$fitAgg)
+
+
+for (i in 1:nrow(real_parameter_combination)) {
+  for(j in 1:length(params$lookbacks)){
+    params$lookbacks[[j]]<- as.integer(real_parameter_combination[i,j])
+    print(c(j,params$lookbacks[[j]]))
+  }
+  results <- backtest(dataList, getOrders, params, sMult = 0.2)
+  pfolioPnL <- plotResults(dataList, results)
+  print(pfolioPnL$fitAgg)
+  
+}
+
+
