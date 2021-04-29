@@ -12,22 +12,31 @@ source('framework/backtester.R')
 source('framework/processResults.R')
 
 # Read in data -- here with the A2 direction; subset it as required
-dataList <- getData(directory="A2")
-# subset data: choose the period to run on 
-#dataList <- lapply(dataList, function(x) x[1:200])
+dataList <- getData(directory = "A2")
+# subset data: choose the period to run on
+dataList <- lapply(dataList, function(x)
+  x[1:819])
 
 # Choose strategy -- this should be called strategy.R when you submit it
-strategyFile <- 'strategies/a2_strategy_template.R'
+strategyFile <- 'strategies/strategy.R'
 
-cat("Sourcing",strategyFile,"\n")
+cat("Sourcing", strategyFile, "\n")
 source(strategyFile) # load in getOrders
 
-# Strategy parameters -- this will not be an empty list when you are done
-params <- list()
 
+# Strategy parameters -- this will not be an empty list when you are done
+params <- list(
+  series = 1:10,
+  lookbacks = list(
+    short = as.integer(5),
+    medium = as.integer(50),
+    long = as.integer(100)
+  )
+)
 print("Parameters:")
 print(params)
 
 # Do backtest
-results <- backtest(dataList,getOrders,params,sMult=0.2)
-pfolioPnL <- plotResults(dataList,results)
+results <- backtest(dataList, getOrders, params, sMult = 0.2)
+pfolioPnL <- plotResults(dataList, results)
+print(pfolioPnL$fitAgg)
