@@ -53,7 +53,7 @@ print(params)
 for (i in 1:nrow(real_parameter_combination)) {
   for(j in 1:length(params$lookbacks)){
     params$lookbacks[[j]]<- as.integer(real_parameter_combination[i,j])
-    print(c(j,params$lookbacks[[j]]))
+    #print(c(j,params$lookbacks[[j]]))
   }
   results <- backtest(dataList, getOrders, params, sMult = 0.2)
   pfolioPnL <- plotResults(dataList, results)
