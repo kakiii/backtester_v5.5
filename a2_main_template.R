@@ -14,7 +14,7 @@ source('framework/processResults.R')
 # Read in data -- here with the A2 direction; subset it as required
 dataList <- getData(directory = "A2")
 # subset data: choose the period to run on
-dataList <- lapply(dataList, function(x) x[1:825])
+dataList <- lapply(dataList, function(x) x[898:2000])
 
 # Choose strategy -- this should be called strategy.R when you submit it
 strategyFile <- 'strategies/strategy.R'
@@ -45,10 +45,10 @@ params <- list(
     long = as.integer(100)
   )
 )
-print("Parameters:")
-print(params)
+#print("Parameters:")
+#print(params)
 
-
+result <- vector(mode="numeric")
 
 for (i in 1:nrow(real_parameter_combination)) {
   for(j in 1:length(params$lookbacks)){
@@ -57,8 +57,10 @@ for (i in 1:nrow(real_parameter_combination)) {
   }
   results <- backtest(dataList, getOrders, params, sMult = 0.2)
   pfolioPnL <- plotResults(dataList, results)
+  result[i]<-pfolioPnL$fitAgg
   print(pfolioPnL$fitAgg)
   
 }
+print(order(result))
 
 
